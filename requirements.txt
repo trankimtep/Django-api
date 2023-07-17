@@ -68,6 +68,7 @@ pyrsistent==0.18.1
 python-apt==2.4.0+ubuntu1
 python-dateutil==2.8.1
 python-debian===0.1.43ubuntu1
+python-decouple==3.8
 python-dotenv==0.19.2
 pytz==2022.1
 pyxdg==0.27
