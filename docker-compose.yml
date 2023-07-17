@@ -1,0 +1,34 @@
+version: '3'
+
+services:
+  db:
+    image: mysql:8.0
+    environment:
+      - MYSQL_DATABASE=api
+      - MYSQL_USER=hungtx
+      - MYSQL_PASSWORD=123
+      - MYSQL_ROOT_PASSWORD=123
+    ports:
+      - "${DB_PORT}:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  web:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - DB_ENGINE=mysql
+      - DB_NAME=api
+      - DB_USER=hungtx
+      - DB_PASSWORD=123
+      - DB_HOST=db
+      - DB_PORT=3306
+
+    depends_on:
+      - db
+    volumes:
+      - .:/app
+
+volumes:
+  mysql_data:
