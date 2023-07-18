@@ -1,34 +1,33 @@
 version: '3'
 
 services:
-  db:
+  database:
     image: mysql:8.0
     environment:
       - MYSQL_DATABASE=api
       - MYSQL_USER=hungtx
       - MYSQL_PASSWORD=123
       - MYSQL_ROOT_PASSWORD=123
-    ports:
-      - "${DB_PORT}:3306"
     volumes:
       - mysql_data:/var/lib/mysql
+    networks:
+      - car_api
 
   web:
     build: .
     ports:
       - "8000:8000"
-    environment:
-      - DB_ENGINE=mysql
-      - DB_NAME=api
-      - DB_USER=hungtx
-      - DB_PASSWORD=123
-      - DB_HOST=db
-      - DB_PORT=3306
-
+    networks:
+      - car_api
     depends_on:
-      - db
+      - database
     volumes:
       - .:/app
+
+
+networks:
+  car_api:
+    driver: bridge
 
 volumes:
   mysql_data:
