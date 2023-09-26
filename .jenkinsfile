@@ -3,7 +3,7 @@ pipeline{
     stages {
         stage ("show dir"){
             steps{
-                sh "cat .jenkinsfile"
+                sh "sudo docker ps"
             }
         }
     }
