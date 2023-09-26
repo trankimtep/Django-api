@@ -12,8 +12,8 @@ pipeline{
         }
         stage ("docker push"){
             steps{
-                withCredentials([usernamePassword(credentialsId: 'dockerhub', passwordVariable: 'dockerHubPassword', usernameVariable: 'dockerHubUser')]) {
-        	        sh "docker login -u ${env.dockerHubUser} -p ${env.dockerHubPassword}"
+                withDockerRegistry(credentialsId: 'dockerhub', url: 'https://docker.io') {
+        	        sh "docker login"
                     sh 'docker push trankimtep/$env.JOB_NAME:$commitHash'
                 }
             }
