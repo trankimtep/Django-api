@@ -4,7 +4,7 @@ pipeline{
         stage ("show dir"){
             steps{
                 script{
-                    withDockerRegistry(credentialsId: 'dockerhub', url: 'docker.io') {
+                    withDockerRegistry(credentialsId: 'dockerhub', url: 'https://docker.io') {
                         def commitHash = sh(script: 'git rev-parse HEAD', returnStdout: true).trim()
                         sh "docker build -t trankimtep/$env.JOB_NAME:$commitHash"
                         sh "docker images"
