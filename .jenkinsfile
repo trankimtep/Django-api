@@ -33,7 +33,7 @@ pipeline{
                     def sshCredentialId = 'ssh-key-to-DBserver'
                     
                     // Command to run (e.g., 'ls' in this case)
-                    def command = 'ls'
+                    def command = 'pwd'
                     
                     // Execute the SSH command
                     withCredentials([sshUserPrivateKey(credentialsId: sshCredentialId, keyFileVariable: 'SSH_PRIVATE_KEY', usernameVariable: 'userName')]) {
