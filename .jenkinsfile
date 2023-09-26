@@ -3,8 +3,9 @@ pipeline{
     stages {
         stage ("show dir"){
             steps{
-                def commitHash = sh(script: 'git rev-parse HEAD', returnStdout: true).trim()
-                echo "Latest Commit Hash: ${commitHash}"
+                sh "export TAG=$(git rev-parse HEAD)"
+                sh "docker build -t carstore:$TAG ."
+                sh "docker images"
             }
         }
     }
