@@ -7,9 +7,9 @@ pipeline{
                     withDockerRegistry(credentialsId: 'dockerhub', url: 'https://docker.io') {
                         def commitHash = sh(script: 'git rev-parse HEAD', returnStdout: true).trim()
                         sh "docker build -t trankimtep/$env.JOB_NAME:$commitHash ."
+                        sh "docker push trankimtep/$env.JOB_NAME:$commitHash"
                         sh "docker images"
-                    }
-                    
+                    }                    
                     
                 }                
             }
