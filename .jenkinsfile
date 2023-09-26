@@ -3,9 +3,12 @@ pipeline{
     stages {
         stage ("show dir"){
             steps{
-                def commitHash = sh(script: 'git rev-parse HEAD', returnStdout: true).trim()
-                sh "docker build -t carstore:$commitHash ."
-                sh "docker images"
+                script{
+                    def commitHash = sh(script: 'git rev-parse HEAD', returnStdout: true).trim()
+                    sh "docker build -t carstore:$commitHash ."
+                    sh "docker images"
+                }
+                
             }
         }
     }
