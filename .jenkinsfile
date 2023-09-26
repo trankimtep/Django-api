@@ -2,7 +2,8 @@ pipeline{
     agent any
     environment { 
         commitHash = sh(script: 'git rev-parse HEAD', returnStdout: true).trim()
-        remoteServer = "10.24.169.112"
+        server = "10.24.169.112"
+        sshCredentialId = 'ssh-key-to-DBserver'
     }
     stages {
         stage ("docker build"){
@@ -22,22 +23,22 @@ pipeline{
                 }
             }
         }
-        stage("SSH to DB Server") {
+
+        stage ("remove running contianer") {
             steps {
                 script {
-                    // Define the SSH server details
-                    def server = "10.24.169.112"
-                    def remoteDir = "/path/to/remote/directory"
-                    
-                    // Define the SSH key credential ID
-                    def sshCredentialId = 'ssh-key-to-DBserver'
-                    
-                    // Command to run (e.g., 'ls' in this case)
-                    // def command = 'docker run -d -p 8000:8000 trankimtep/${env.JOB_NAME}:${commitHash}'
-                    
-                    // Execute the SSH command
                     withCredentials([sshUserPrivateKey(credentialsId: sshCredentialId, keyFileVariable: 'SSH_PRIVATE_KEY', usernameVariable: 'userName')]) {
-                        sh "ssh -o StrictHostKeyChecking=no -i \$SSH_PRIVATE_KEY ${userName}@${server} docker stop ${env.JOB_NAME} && docker ps && docker ps -a && docker rm ${env.JOB_NAME} && docker run --rm --name ${env.JOB_NAME} -d -p 8000:8000 trankimtep/${env.JOB_NAME}:${commitHash}"
+                        sh "ssh -o StrictHostKeyChecking=no -i \$SSH_PRIVATE_KEY ${userName}@${server} docker stop ${env.JOB_NAME} || true
+                    }
+                }
+            }
+        }
+
+        stage("docker run ") {
+            steps {
+                script {
+                    withCredentials([sshUserPrivateKey(credentialsId: sshCredentialId, keyFileVariable: 'SSH_PRIVATE_KEY', usernameVariable: 'userName')]) {
+                        sh "ssh -o StrictHostKeyChecking=no -i \$SSH_PRIVATE_KEY ${userName}@${server} docker run --rm --name ${env.JOB_NAME} -d -p 8000:8000 trankimtep/${env.JOB_NAME}:${commitHash}"
                     }
                 }
             }
