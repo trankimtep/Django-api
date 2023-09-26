@@ -5,10 +5,9 @@ pipeline{
             steps{
                 script{
                     def commitHash = sh(script: 'git rev-parse HEAD', returnStdout: true).trim()
-                    sh "docker build -t carstore:$commitHash ."
+                    sh "docker-compose up"
                     sh "docker images"
-                }
-                
+                }                
             }
         }
     }
