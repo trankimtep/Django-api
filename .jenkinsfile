@@ -1,18 +1,21 @@
 pipeline{
     agent any
     stages {
-        stage ("show dir"){
+        stage ("docker build"){
             steps{
                 script{
-                    withDockerRegistry(credentialsId: 'dockerhub', url: 'https://docker.io') {
                         def commitHash = sh(script: 'git rev-parse HEAD', returnStdout: true).trim()
-                        sh "docker build -t trankimtep/$env.JOB_NAME:$commitHash ."
-                        sh "docker login"
-                        sh "docker push trankimtep/$env.JOB_NAME:$commitHash"
-                        sh "docker images"
-                    }                    
+                        sh "docker build -t trankimtep/$env.JOB_NAME:$commitHash ."         
                     
                 }                
+            }
+        }
+        stage ("docker push"){
+            steps{
+                withCredentials([usernamePassword(credentialsId: 'dockerHub', passwordVariable: 'dockerHubPassword', usernameVariable: 'dockerHubUser')]) {
+        	        sh "docker login -u ${env.dockerHubUser} -p ${env.dockerHubPassword}"
+                    sh 'docker push trankimtep/$env.JOB_NAME:$commitHash'
+                }
             }
         }
     }
