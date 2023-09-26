@@ -37,7 +37,7 @@ pipeline{
                     
                     // Execute the SSH command
                     withCredentials([sshUserPrivateKey(credentialsId: sshCredentialId, keyFileVariable: 'SSH_PRIVATE_KEY', usernameVariable: 'userName')]) {
-                        sh "ssh -o StrictHostKeyChecking=no -i \$SSH_PRIVATE_KEY ${userName}@${server} docker stop $(docker ps -q) && docker rm $(docker ps -aq) && docker run --name ${env.JOB_NAME} -d -p 8000:8000 trankimtep/${env.JOB_NAME}:${commitHash}"
+                        sh "ssh -o StrictHostKeyChecking=no -i \$SSH_PRIVATE_KEY ${userName}@${server} docker stop ${env.JOB_NAME} && docker rm ${env.JOB_NAME} && docker run --name ${env.JOB_NAME} -d -p 8000:8000 trankimtep/${env.JOB_NAME}:${commitHash} || true"
                     }
                 }
             }
