@@ -36,7 +36,7 @@ pipeline{
                     def command = 'ls'
                     
                     // Execute the SSH command
-                    sshagent(credentials: [sshCredentialId]) {
+                    withCredentials([sshUserPrivateKey(credentialsId: sshCredentialId, keyFileVariable: 'SSH_PRIVATE_KEY')]) {
                         sh "ssh -o StrictHostKeyChecking=no -i \$SSH_PRIVATE_KEY username@${server} '${command}'"
                     }
                 }
