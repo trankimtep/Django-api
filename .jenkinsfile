@@ -5,27 +5,40 @@ pipeline{
         remoteServer = "10.24.169.112"
     }
     stages {
-        stage ("docker build"){
-            steps{
-                script{
-                        // def 
-                        sh "docker build -t trankimtep/$env.JOB_NAME:$commitHash ."         
+        // stage ("docker build"){
+        //     steps{
+        //         script{
+        //                 // def 
+        //                 sh "docker build -t trankimtep/$env.JOB_NAME:$commitHash ."         
                     
-                }                
-            }
-        }
-        stage ("docker push"){
-            steps{
-                withCredentials([usernamePassword(credentialsId: 'dockerhub', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
-        	        sh ('docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD')
-                    sh "docker push trankimtep/$env.JOB_NAME:$commitHash"
-                }
-            }
-        }
-        stage ("ssh connect"){
-            steps{
-                withCredentials([sshUserPrivateKey(credentialsId: 'ssh-key-to-DBserver', keyFileVariable: 'identity', passphraseVariable: '', usernameVariable: 'userName')]) {
-                    sh ('ssh -i $identity $userName@$remoteServer -yes')
+        //         }                
+        //     }
+        // }
+        // stage ("docker push"){
+        //     steps{
+        //         withCredentials([usernamePassword(credentialsId: 'dockerhub', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
+        // 	        sh ('docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD')
+        //             sh "docker push trankimtep/$env.JOB_NAME:$commitHash"
+        //         }
+        //     }
+        // }
+        stage("SSH to DB Server") {
+            steps {
+                script {
+                    // Define the SSH server details
+                    def server = "10.24.169.112"
+                    def remoteDir = "/path/to/remote/directory"
+                    
+                    // Define the SSH key credential ID
+                    def sshCredentialId = 'ssh-key-to-DBserver'
+                    
+                    // Command to run (e.g., 'ls' in this case)
+                    def command = 'ls'
+                    
+                    // Execute the SSH command
+                    sshagent(credentials: [sshCredentialId]) {
+                        sh "ssh -o StrictHostKeyChecking=no -i \$SSH_PRIVATE_KEY username@${server} '${command}'"
+                    }
                 }
             }
         }
