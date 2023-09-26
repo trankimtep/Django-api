@@ -3,6 +3,7 @@ pipeline{
     stages {
         stage ("show dir"){
             steps{
+                sh "ls ."
                 sh "pwd"
             }
         }
