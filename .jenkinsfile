@@ -2,6 +2,7 @@ pipeline{
     agent any
     environment { 
         commitHash = sh(script: 'git rev-parse HEAD', returnStdout: true).trim()
+        remoteServer = "10.24.169.112"
     }
     stages {
         stage ("docker build"){
@@ -21,11 +22,22 @@ pipeline{
                 }
             }
         }
-        stage ("ssh connect"){
-            steps{
-                withCredentials([sshUserPrivateKey(credentialsId: 'ssh-key-to-DBserver', keyFileVariable: 'identity', passphraseVariable: '', usernameVariable: 'userName')]) {
-                    sh ('echo $userName')
-                }
+    }
+    def remote = [:]
+    remote.name = "node-1"
+    remote.host = "10.24.169.112"
+    remote.allowAnyHosts = true
+
+    node {
+        withCredentials([sshUserPrivateKey(credentialsId: 'ssh-key-to-DBserver', keyFileVariable: 'identity', passphraseVariable: '', usernameVariable: 'userName')]) {
+            remote.user = userName
+            remote.identityFile = identity
+            stage("SSH Steps Rocks!") {
+                sshCommand remote: remote, command: 'ls'
+                // sshPut remote: remote, from: 'abc.sh', into: '.'
+                // sshGet remote: remote, from: 'abc.sh', into: 'bac.sh', override: true
+                // sshScript remote: remote, script: 'abc.sh'
+                // sshRemove remote: remote, path: 'abc.sh'
             }
         }
     }
