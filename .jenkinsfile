@@ -3,8 +3,8 @@ pipeline{
     stages {
         stage ("show dir"){
             steps{
-                sh "export TAG=$(git rev-parse HEAD)"
-                sh "docker build -t carstore:$TAG ."
+                commitHash = sh(script: 'git rev-parse HEAD', returnStdout: true).trim()
+                sh "docker build -t carstore:$commitHash ."
                 sh "docker images"
             }
         }
