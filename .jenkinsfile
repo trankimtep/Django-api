@@ -3,7 +3,8 @@ pipeline{
     stages {
         stage ("show dir"){
             steps{
-                sh "git log"
+                def commitHash = sh(script: 'git rev-parse HEAD', returnStdout: true).trim()
+                echo "Latest Commit Hash: ${commitHash}"
             }
         }
     }
