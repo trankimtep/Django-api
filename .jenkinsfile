@@ -33,7 +33,7 @@ pipeline{
                     def sshCredentialId = 'ssh-key-to-DBserver'
                     
                     // Command to run (e.g., 'ls' in this case)
-                    def command = 'docker run -d -p 8000:8000 trankimtep/$env.JOB_NAME:$commitHash'
+                    def command = 'docker run -d -p 8000:8000 trankimtep/${env.JOB_NAME}:${commitHash}'
                     
                     // Execute the SSH command
                     withCredentials([sshUserPrivateKey(credentialsId: sshCredentialId, keyFileVariable: 'SSH_PRIVATE_KEY', usernameVariable: 'userName')]) {
