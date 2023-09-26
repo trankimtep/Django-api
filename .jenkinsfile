@@ -22,7 +22,7 @@ pipeline{
             }
         }
         stage ("ssh connect"){
-            step{
+            steps{
                 withCredentials([sshUserPrivateKey(credentialsId: 'ssh-key-to-DBserver', keyFileVariable: 'identity', passphraseVariable: '', usernameVariable: 'userName')]) {
                     sh ('echo $userName')
                 }
