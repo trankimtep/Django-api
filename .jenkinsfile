@@ -63,7 +63,7 @@ node{
     stage("docker push"){
         withCredentials([usernamePassword(credentialsId: 'dockerhub', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
             sh ('docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD')
-            sh "docker push trankimtep/$env.JOB_NAME:$commitHash"
+            sh "docker push ${DOCKER_REGISTRY}/${env.JOB_NAME}:${COMMIT_HASH}"
         }
     }
     stage("docker run"){
