@@ -47,13 +47,16 @@
 // }
 
 
+def COMMIT_HASH
+def REMOTE_SERVER
+def SSH_CREDENTIALS
+def DOCKER_REGISTRY
+
 node{
-    environment{
-        COMMIT_HASH = sh(script: 'git rev-parse HEAD', returnStdout: true).trim()
-        REMOTE_SERVER = "10.24.169.112"
-        SSH_CREDENTIALS = credentials('ssh-key-to-DBserver')
-        DOCKER_REGISTRY = "trankimtep"
-    }
+    COMMIT_HASH = sh(script: 'git rev-parse HEAD', returnStdout: true).trim()
+    REMOTE_SERVER = "10.24.169.112"
+    SSH_CREDENTIALS = credentials('ssh-key-to-DBserver')
+    DOCKER_REGISTRY = "trankimtep"
     stage ("docker build"){
         sh("docker build -t ${DOCKER_REGISTRY}/${env.JOB_NAME}:${COMMIT_HASH} .")
     }
