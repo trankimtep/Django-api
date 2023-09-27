@@ -59,7 +59,7 @@ node{
     DOCKER_REGISTRY = "trankimtep"
     stage ("docker build"){
         // sh("docker build -t ${DOCKER_REGISTRY}/${env.JOB_NAME}:${COMMIT_HASH} .")
-        pwd()
+        sh("docker ps")
     }
     stage("docker push"){
         withDockerRegistry(credentialsId: 'dockerhub', url: 'https://docker.io') {
