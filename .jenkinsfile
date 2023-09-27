@@ -67,9 +67,9 @@ node{
         }
     }
     stage("docker run"){
-        withCredentials([sshUserPrivateKey(credentialsId: sshCredentialId, keyFileVariable: 'SSH_PRIVATE_KEY', usernameVariable: 'userName')]) {
-            sh "ssh -o StrictHostKeyChecking=no -i \$SSH_PRIVATE_KEY ${userName}@${server} docker stop ${env.JOB_NAME} || true"
-            sh "ssh -o StrictHostKeyChecking=no -i \$SSH_PRIVATE_KEY ${userName}@${server} docker run --rm --name ${env.JOB_NAME} -d -p 8000:8000 ${DOCKER_REGISTRY}/${env.JOB_NAME}:${COMMIT_HASH}"
+        withCredentials([sshUserPrivateKey(credentialsId: SSH_CREDENTIALS, keyFileVariable: 'SSH_PRIVATE_KEY', usernameVariable: 'userName')]) {
+            sh "ssh -o StrictHostKeyChecking=no -i \$SSH_PRIVATE_KEY ${userName}@${REMOTE_SERVER} docker stop ${env.JOB_NAME} || true"
+            sh "ssh -o StrictHostKeyChecking=no -i \$SSH_PRIVATE_KEY ${userName}@${REMOTE_SERVER} docker run --rm --name ${env.JOB_NAME} -d -p 8000:8000 ${DOCKER_REGISTRY}/${env.JOB_NAME}:${COMMIT_HASH}"
         } 
     }
 }
