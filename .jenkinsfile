@@ -1,47 +1,71 @@
-pipeline{
-    agent any
-    environment { 
-        commitHash = sh(script: 'git rev-parse HEAD', returnStdout: true).trim()
-        server = "10.24.169.112"
-        sshCredentialId = 'ssh-key-to-DBserver'
-    }
-    stages {
-        stage ("docker build"){
-            steps{
-                script{
-                        // def 
-                        sh "docker build -t trankimtep/$env.JOB_NAME:$commitHash ."         
+// pipeline{
+//     agent any
+//     environment { 
+//         commitHash = sh(script: 'git rev-parse HEAD', returnStdout: true).trim()
+//         server = "10.24.169.112"
+//         SSH_CREDENTIALS = credentials('ssh-key-to-DBserver')
+//     }
+//     stages {
+//         stage ("docker build"){
+//             steps{
+//                 script{
+//                         // def 
+//                         sh "docker build -t trankimtep/$env.JOB_NAME:$commitHash ."         
                     
-                }                
-            }
-        }
-        stage ("docker push"){
-            steps{
-                withCredentials([usernamePassword(credentialsId: 'dockerhub', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
-        	        sh ('docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD')
-                    sh "docker push trankimtep/$env.JOB_NAME:$commitHash"
-                }
-            }
-        }
+//                 }                
+//             }
+//         }
+//         stage ("docker push"){
+//             steps{
+//                 withCredentials([usernamePassword(credentialsId: 'dockerhub', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
+//         	        sh ('docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD')
+//                     sh "docker push trankimtep/$env.JOB_NAME:$commitHash"
+//                 }
+//             }
+//         }
 
-        stage ("remove running contianer") {
-            steps {
-                script {
-                    withCredentials([sshUserPrivateKey(credentialsId: sshCredentialId, keyFileVariable: 'SSH_PRIVATE_KEY', usernameVariable: 'userName')]) {
-                        sh "ssh -o StrictHostKeyChecking=no -i \$SSH_PRIVATE_KEY ${userName}@${server} docker stop ${env.JOB_NAME} || true"
-                    }
-                }
-            }
-        }
+//         stage ("remove running contianer") {
+//             steps {
+                // script {
+                //     withCredentials([sshUserPrivateKey(credentialsId: sshCredentialId, keyFileVariable: 'SSH_PRIVATE_KEY', usernameVariable: 'userName')]) {
+                //         sh "ssh -o StrictHostKeyChecking=no -i \$SSH_PRIVATE_KEY ${userName}@${server} docker stop ${env.JOB_NAME} || true"
+                //     }
+                // }
+//             }
+//         }
 
-        stage("docker run ") {
-            steps {
-                script {
-                    withCredentials([sshUserPrivateKey(credentialsId: sshCredentialId, keyFileVariable: 'SSH_PRIVATE_KEY', usernameVariable: 'userName')]) {
-                        sh "ssh -o StrictHostKeyChecking=no -i \$SSH_PRIVATE_KEY ${userName}@${server} docker run --rm --name ${env.JOB_NAME} -d -p 8000:8000 trankimtep/${env.JOB_NAME}:${commitHash}"
-                    }
-                }
-            }
+//         stage("docker run ") {
+//             steps {
+//                 script {
+//                     withCredentials([sshUserPrivateKey(credentialsId: sshCredentialId, keyFileVariable: 'SSH_PRIVATE_KEY', usernameVariable: 'userName')]) {
+//                         sh "ssh -o StrictHostKeyChecking=no -i \$SSH_PRIVATE_KEY ${userName}@${server} docker run --rm --name ${env.JOB_NAME} -d -p 8000:8000 trankimtep/${env.JOB_NAME}:${commitHash}"
+//                     }
+//                 }
+//             }
+//         }
+//     }
+// }
+
+
+node{
+    environment{
+        COMMIT_HASH = sh(script: 'git rev-parse HEAD', returnStdout: true).trim()
+        REMOTE_SERVER = "10.24.169.112"
+        SSH_CREDENTIALS = credentials('ssh-key-to-DBserver')
+        DOCKER_REGISTRY = 'trankimtep'
+    }
+    stage ("docker build"){
+        sh("docker build -t $DOCKER_REGISTRY/$env.JOB_NAME:$COMMIT_HASH .")
+    }
+    stage("docker push"){
+        withDockerRegistry(credentialsId: 'dockerhub', url: 'https://docker.io') {
+            sh("docker push $DOCKER_REGISTRY/$env.JOB_NAME:$COMMIT_HASH")
         }
+    }
+    stage("docker run"){
+        withCredentials([sshUserPrivateKey(credentialsId: sshCredentialId, keyFileVariable: 'SSH_PRIVATE_KEY', usernameVariable: 'userName')]) {
+            sh "ssh -o StrictHostKeyChecking=no -i \$SSH_PRIVATE_KEY ${userName}@${server} docker stop ${env.JOB_NAME} || true"
+            sh "ssh -o StrictHostKeyChecking=no -i \$SSH_PRIVATE_KEY ${userName}@${server} docker run --rm --name ${env.JOB_NAME} -d -p 8000:8000 ${DOCKER_REGISTRY}/${env.JOB_NAME}:${COMMIT_HASH}"
+        } 
     }
 }
