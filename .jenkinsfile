@@ -1,5 +1,7 @@
 pipeline{
-    agent worker1
+    agent {
+        label 'ubuntu'
+    }
     environment { 
         COMMIT_HASH = sh(script: 'git rev-parse HEAD', returnStdout: true).trim()
         REMOTE_SERVER = "10.24.169.112"
